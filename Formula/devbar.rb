@@ -2,7 +2,7 @@ class Devbar < Formula
   desc "macOS menu bar app that monitors local dev servers and AI coding agents"
   homepage "https://github.com/yanirmanor/devbar"
   url "https://github.com/yanirmanor/devbar/archive/refs/tags/v1.5.1.tar.gz"
-  sha256 "a5211bfdecc1262aee8cb8aaa5585203e57f5aff0b68aa0c3b863ad3035bf378"
+  sha256 "f72ebdac692ed0bc4038242a0b136cfe728e34abbf7a5737883f308ab9d0fd98"
   license "MIT"
 
   depends_on :macos
@@ -24,13 +24,23 @@ class Devbar < Formula
   end
 
   def post_install
-    system "rm", "-rf", "/Applications/DevBar.app"
-    system "cp", "-R", (prefix/"DevBar.app").to_s, "/Applications/DevBar.app"
+    # Kill running DevBar before replacing
+    system "pkill", "-x", "DevBar"
+    sleep 1
+
+    # Use osascript with admin privileges to bypass macOS App Management restrictions.
+    # This prompts the user for their password via a native macOS dialog.
+    app_source = prefix/"DevBar.app"
+    system "osascript", "-e",
+      "do shell script \"rm -rf /Applications/DevBar.app && " \
+      "cp -R #{app_source} /Applications/DevBar.app\" " \
+      "with administrator privileges"
   end
 
   def caveats
     <<~EOS
-      DevBar has been added to /Applications.
+      DevBar has been installed to /Applications.
+      You may be prompted for your password during installation.
       Open it from Spotlight, Raycast, or run:
         open /Applications/DevBar.app
       It will appear as a </> icon in your menu bar.
