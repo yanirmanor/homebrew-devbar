@@ -25,8 +25,10 @@ class Devbar < Formula
 
   def post_install
     # Kill running DevBar before replacing
-    system "pkill", "-x", "DevBar"
-    sleep 1
+    if quiet_system "pgrep", "-x", "DevBar"
+      system "pkill", "-x", "DevBar"
+      sleep 1
+    end
 
     # Use osascript with admin privileges to bypass macOS App Management restrictions.
     # This prompts the user for their password via a native macOS dialog.
