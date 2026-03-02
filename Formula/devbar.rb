@@ -2,7 +2,7 @@ class Devbar < Formula
   desc "macOS menu bar app that monitors local dev servers and AI coding agents"
   homepage "https://github.com/yanirmanor/devbar"
   url "https://github.com/yanirmanor/devbar/archive/refs/tags/v1.3.0.tar.gz"
-  sha256 "b947ee2fd2422443efbb5b1b8f0d378cfc627b04cbac10a10595066405f9fcf9"
+  sha256 "db2c838809fb769d6c59555495c7bbeef5fa7e9dbcff00298bacfe05cb8a088a"
   license "MIT"
 
   depends_on :macos
@@ -11,15 +11,16 @@ class Devbar < Formula
     system "swift", "build", "-c", "release", "--disable-sandbox",
            "--build-path", buildpath/".build"
     binary = buildpath/".build/release/DevBar"
-    bin.install binary => "devbar"
 
-    # Build .app bundle for Spotlight / Raycast discovery
+    # Build .app bundle before bin.install moves the binary
     app_dir = prefix/"DevBar.app/Contents"
     (app_dir/"MacOS").mkpath
     (app_dir/"Resources").mkpath
     cp buildpath/"assets/Info.plist", app_dir/"Info.plist"
-    cp binary, app_dir/"MacOS/DevBar" if binary.exist?
+    cp binary, app_dir/"MacOS/DevBar"
     cp buildpath/"assets/AppIcon.icns", app_dir/"Resources/AppIcon.icns" if (buildpath/"assets/AppIcon.icns").exist?
+
+    bin.install binary => "devbar"
   end
 
   def post_install
